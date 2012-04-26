@@ -1,16 +1,30 @@
-#define MU_ASSERT(message, test)\
-	do {\
-		if (!(test)) {\
-			return {message, 1};\
-		} else {\
-			return {message, 0}; \
-		}\
-	} while (0)
-#define MU_RUN_TEST(test) do { char *message = test(); tests_run++; \
-                               if (message) return message; } while (0)
+#ifndef UNITSTUFF_MINUNIT_H
+#define UNITSTUFF_MINUNIT_H
+
 extern int tests_run;
 
-typedef struct test_result {
+typedef struct {
 	char *message;
 	int retval;
-} test_result_type;
+} TestResult;
+
+#define MU_ASSERT(msg, test)\
+    do {\
+        TestResult test_result;\
+        test_result.message = msg;\
+        if (!(test)) {\
+            test_result.retval = 1;\
+        } else {\
+            test_result.retval = 0;\
+        }\
+        return &test_result;\
+    } while (0)
+
+#define MU_RUN_TEST(test)\
+    do {\
+        TestResult *message = test();\
+        tests_run++;\
+        return message;\
+    } while (0)
+
+#endif // UNITSTUFF_MINUNIT_H
