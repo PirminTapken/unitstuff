@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 int tests_run = 0;
+TestResult **result_stack;
 
 int add_two_numbers(int a, int b)
 {
@@ -16,11 +17,11 @@ TestResult *test_one_plus_one(void)
 
 TestResult *test_adding(void)
 {
-    MU_ASSERT("test adding 1 and 3", 2 == add_two_numbers(1, 3));
+    MU_ASSERT("test adding 1 and 3", 4 == add_two_numbers(1, 3));
     return NULL;
 }
 
-char *test_suite(void)
+TestResult *test_suite(void)
 {
     MU_RUN_TEST(test_one_plus_one);
     MU_RUN_TEST(test_adding);
@@ -29,9 +30,9 @@ char *test_suite(void)
 
 int main(int ac, char **av)
 {
-    char *result = test_suite();
+    TestResult *result = test_suite();
 
     printf("number of tests run: %d\n", tests_run);
-    if (result) printf("FAIL: %s\n", result);
+    if ((*result).retval) printf("FAIL: %s\n", (*result).message);
     return 0 != result;
 }
