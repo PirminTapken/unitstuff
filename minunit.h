@@ -1,30 +1,32 @@
 #ifndef UNITSTUFF_MINUNIT_H
 #define UNITSTUFF_MINUNIT_H
 
-typedef struct {
-	char *message;
-	int retval;
-} TestResult;
+/*extern int tests_run;*/
 
-extern int tests_run;
-
-#define MU_ASSERT(msg, test)            \
-    do {                                \
-        TestResult test_result;         \
-        test_result.message = msg;      \
-        if (!(test)) {                  \
-            test_result.retval = 1;     \
-        } else {                        \
-            test_result.retval = 0;     \
-        }                               \
-        return &test_result;            \
+#define MU_ASSERT(msg, test)                    \
+    do {                                        \
+        if (!(test)) {                          \
+            return msg;                         \
+        }                                       \
     } while (0)
 
-#define MU_RUN_TEST(test)\
-    do {\
-        TestResult *message = test();\
-        tests_run++;\
-        return message;\
+#define MU_RUN_TESTS(event_handler, ...)        \
+    do {                                        \
+        char *(*tests[])(void) = {               \
+            __VA_ARGS__,                        \
+            NULL                                \
+        };                                      \
+        int i = 0;                              \
+        while (tests[i] != NULL) {              \
+/*            tests_run++;*/                        \
+            char *message = tests[i]();         \
+            if (message) {                      \
+                event_handler(message, 0);      \
+            } else {                            \
+                event_handler(message, 1);      \
+            }                                   \
+            i++;                                \
+        }                                       \
     } while (0)
 
 #endif // UNITSTUFF_MINUNIT_H

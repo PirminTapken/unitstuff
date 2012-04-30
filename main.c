@@ -2,37 +2,50 @@
 #include <stdio.h>
 
 int tests_run = 0;
-TestResult **result_stack;
+int tests_failed = 0;
 
 int add_two_numbers(int a, int b)
 {
-    return a + b;
+	return a + b;
 }
 
-TestResult *test_one_plus_one(void)
+char *test_one_plus_one(void)
 { 
-    MU_ASSERT("test 1+1", 2 == 1+1);
-    return NULL;
+	MU_ASSERT("test 1+1", 2 == 1+1);
+	return 0;
 }
 
-TestResult *test_adding(void)
+char *test_adding(void)
 {
-    MU_ASSERT("test adding 1 and 3", 4 == add_two_numbers(1, 3));
-    return NULL;
+	MU_ASSERT("test adding 1 and 3", 2 == add_two_numbers(1, 3));
+	return 0;
 }
 
-TestResult *test_suite(void)
+void event_handler(char *message, char success)
 {
-    MU_RUN_TEST(test_one_plus_one);
-    MU_RUN_TEST(test_adding);
-    return NULL;
+    tests_run++;
+    printf("Test %d...", tests_run);
+    if (!(success)) {
+        tests_failed++;
+        printf("FAIL: %s\n", message);
+    } else {
+        printf("done.\n");
+    }
+}
+
+char test_suite(void)
+{
+    MU_RUN_TESTS(event_handler,
+        test_one_plus_one,
+        test_adding);
+    return 0;
 }
 
 int main(int ac, char **av)
 {
-    TestResult *result = test_suite();
+    char result = test_suite();
 
-    printf("number of tests run: %d\n", tests_run);
-    if ((*result).retval) printf("FAIL: %s\n", (*result).message);
-    return 0 != result;
+    printf("Number of tests run: %d\n", tests_run);
+    printf("Tests failed: %d\n", tests_failed);
+    return result;
 }
