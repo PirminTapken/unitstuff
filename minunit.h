@@ -1,7 +1,10 @@
 #ifndef UNITSTUFF_MINUNIT_H
 #define UNITSTUFF_MINUNIT_H
 
-/*extern int tests_run;*/
+typedef struct Test_Data {
+    int tests_run ;
+    int tests_failed;
+} Test_Data;
 
 #define MU_ASSERT(msg, test)                    \
     do {                                        \
@@ -10,21 +13,27 @@
         }                                       \
     } while (0)
 
-#define MU_RUN_TESTS(event_handler, ...)        \
+#define MU_RUN_TESTS(event_handler, testdata, ...)        \
     do {                                        \
-        char *(*tests[])(void) = {               \
+        /**
+         * This is a list of function pointers
+         * returning pointers to char-arrays.
+         * The functions don't take arguments.
+         */                                     \
+        char *(*tests[])(void) = {              \
             __VA_ARGS__,                        \
             NULL                                \
         };                                      \
         int i = 0;                              \
         while (tests[i] != NULL) {              \
-/*            tests_run++;*/                        \
             char *message = tests[i]();         \
+            int is_successful;                  \
             if (message) {                      \
-                event_handler(message, 0);      \
+                is_successful = 0;              \
             } else {                            \
-                event_handler(message, 1);      \
+                is_successful = 1;              \
             }                                   \
+            event_handler(message, is_successful, testdata);\
             i++;                                \
         }                                       \
     } while (0)

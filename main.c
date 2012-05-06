@@ -1,8 +1,6 @@
 #include <minunit.h>
 #include <stdio.h>
-
-int tests_run = 0;
-int tests_failed = 0;
+#include <stdlib.h>
 
 int add_two_numbers(int a, int b)
 {
@@ -21,31 +19,35 @@ char *test_adding(void)
 	return 0;
 }
 
-void event_handler(char *message, char success)
+void event_handler(char *message, char success, Test_Data *testdata)
 {
-    tests_run++;
-    printf("Test %d...", tests_run);
+    testdata->tests_run++;
+    printf("Test %d...", testdata->tests_run);
     if (!(success)) {
-        tests_failed++;
+        testdata->tests_failed++;
         printf("FAIL: %s\n", message);
     } else {
         printf("done.\n");
     }
 }
 
-char test_suite(void)
+Test_Data *test_suite(void)
 {
+    Test_Data *testdata = malloc(sizeof(Test_Data));
+    testdata->tests_run = 0;
+    testdata->tests_failed = 0;
     MU_RUN_TESTS(event_handler,
+        testdata,
         test_one_plus_one,
         test_adding);
-    return 0;
+    return testdata;
 }
 
 int main(int ac, char **av)
 {
-    char result = test_suite();
+    Test_Data *result = test_suite();
 
-    printf("Number of tests run: %d\n", tests_run);
-    printf("Tests failed: %d\n", tests_failed);
-    return result;
+    printf("Number of tests run: %d\n", result->tests_run);
+    printf("Tests failed: %d\n", result->tests_failed);
+    return result->tests_failed;
 }
