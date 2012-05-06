@@ -34,8 +34,6 @@ void event_handler(char *message, char success, Test_Data *testdata)
 Test_Data *test_suite(void)
 {
     Test_Data *testdata = malloc(sizeof(Test_Data));
-    testdata->tests_run = 0;
-    testdata->tests_failed = 0;
     MU_RUN_TESTS(event_handler,
         testdata,
         test_one_plus_one,

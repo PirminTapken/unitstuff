@@ -24,6 +24,9 @@ typedef struct Test_Data {
             __VA_ARGS__,                        \
             NULL                                \
         };                                      \
+        /* Resetting the values */              \
+        testdata->tests_run = 0;                \
+        testdata->tests_failed = 0;             \
         int i = 0;                              \
         while (tests[i] != NULL) {              \
             char *message = tests[i]();         \
